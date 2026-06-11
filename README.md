@@ -1,4 +1,6 @@
-# krak-lite
+# Krak-Lite
+
+![Krak Lite OG Image](https://raw.githubusercontent.com/karibsen-studio/krak-lite/main/.github/assets/cover.png)
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
@@ -167,6 +169,10 @@ export default defineEventHandler(async (event) => {
   return null
 })
 ```
+
+## Roadmap
+
+- Support per-page tracking options via `definePageMeta`, allowing automatic page views to be enabled or disabled on specific routes.
 
 ## Contribution
 
