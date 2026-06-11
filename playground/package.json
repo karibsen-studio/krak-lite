@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "name": "krak-lite-playground",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "krak-lite": "latest",
+    "nuxt": "^4.4.8"
+  }
+}
