@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   compatibilityDate: 'latest',
   krakLite: {
     enabled: true,
-    endpoint: '/api/analytics/events',
+    endpoint: '/api/analytics/actions',
     source: 'playground',
     flushInterval: 5000,
     debug: true,

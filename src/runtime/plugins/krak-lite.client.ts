@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import type { KrakLiteOptions } from '../types'
-import { defineNuxtPlugin, useRuntimeConfig } from 'nuxt/app'
+import { defineNuxtPlugin, useRouter, useRuntimeConfig } from 'nuxt/app'
 import { resolveCaptureTarget } from '../internal/auto-capture'
 import { useKrakLiteState } from '../internal/state'
 import { useKrakLite } from '../composables/useKrakLite'
@@ -27,7 +27,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     const target = resolveCaptureTarget(event.target)
     if (!target) return
 
-    track(target.eventName, target.data, { immediate: target.immediate })
+    track(target.actionName, target.meta, { immediate: target.immediate })
   }
 
   const cleanup = () => {
@@ -58,7 +58,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   if (options.autoPageView) {
+    const router = useRouter()
+
     nuxtApp.hook('page:finish', () => {
+      if (router.currentRoute.value.meta.krakLite?.pageView === false) return
+
       pageView()
     })
   }

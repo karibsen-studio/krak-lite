@@ -1,5 +1,5 @@
 import type { KrakLiteQueueItem } from '../types'
-import {useNuxtApp} from "nuxt/app";
+import { useNuxtApp } from 'nuxt/app'
 
 type KrakLiteState = {
   queue: KrakLiteQueueItem[]

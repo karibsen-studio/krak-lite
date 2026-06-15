@@ -9,7 +9,7 @@
 
 Lightweight, privacy-first analytics module for Nuxt.
 
-krak-lite batches events client-side and ships them to **your own** endpoint — no third-party servers, no cookies, no persistent identifiers. The session id lives in memory only and is gone on reload, so a visitor can never be tied back across page lifetimes.
+krak-lite batches actions client-side and ships them to **your own** endpoint — no third-party servers, no cookies, no persistent identifiers. The session id lives in memory only and is gone on reload, so a visitor can never be tied back across page lifetimes.
 
 ## Features
 
@@ -45,7 +45,7 @@ export default defineNuxtConfig({
   modules: ['@karibsen/krak-lite-nuxt'],
 
   krakLite: {
-    endpoint: '/api/analytics/events',
+    endpoint: '/api/analytics/actions',
     source: 'my-app',
     autoPageView: true,
   },
@@ -61,9 +61,9 @@ All options live under the `krakLite` key. Defaults shown below.
 ```ts
 krakLite: {
   enabled: true,                        // master switch
-  endpoint: '/api/analytics/events',    // where batches are POSTed
-  source: 'unknown',                    // tag every event with its origin
-  maxQueueSize: 100,                    // oldest events dropped past this
+  endpoint: '/api/analytics/actions',    // where batches are POSTed
+  source: 'unknown',                    // tag every action with its origin
+  maxQueueSize: 100,                    // oldest action dropped past this
   flushInterval: 30_000,                // ms between automatic flushes
   debug: false,                         // log queue/flush activity
   autoPageView: false,                  // track `page_view` on route change
@@ -85,7 +85,7 @@ Use the auto-imported `useKrakLite` composable:
 const { track, flush } = useKrakLite()
 
 function onSubscribe() {
-  track('cta_click', { plan: 'pro', price: 29 })
+  track('cc', { plan: 'pro', price: 29 })
 }
 
 function onCheckout() {
@@ -95,32 +95,31 @@ function onCheckout() {
 </script>
 ```
 
-`track(eventName, data?, options?)`:
+`track(actionName, data?, options?)`:
 
-| Argument    | Type                                  | Description                                    |
-| ----------- | ------------------------------------- | ---------------------------------------------- |
-| `eventName` | `string`                              | Free-form, or one of the built-in event names. |
-| `data`      | `Record<string, unknown>`             | Optional structured payload.                   |
-| `options`   | `{ immediate?, retry?, retryAfter? }` | Flush now and/or override retry settings.      |
+| Argument     | Type                                  | Description                                     |
+|--------------| ------------------------------------- |-------------------------------------------------|
+| `actionName` | `string`                              | Free-form, or one of the built-in action names. |
+| `meta`       | `Record<string, unknown>`             | Optional structured payload.                    |
+| `options`    | `{ immediate?, retry?, retryAfter? }` | Flush now and/or override retry settings.       |
 
 `flush(options?)` forces the queue to be sent; pass `{ preferBeacon: true }` to use `navigator.sendBeacon`.
 
-Built-in event names are exported for convenience:
+Built-in action names are exported for convenience:
 
 ```ts
-import { KRAK_LITE_EVENTS } from '@karibsen/krak-lite-nuxt'
-// page_view, click, outbound_click, form_submit,
-// cta_click, language_changed, search, share
+import { KRAK_LITE_ACTIONS } from '@karibsen/krak-lite-nuxt'
+// pv, cc
 ```
 
 ### Declarative click tracking
 
 With `autoCapture` enabled (default), any click on an element carrying
-`data-krak-event` is tracked — no JavaScript required:
+`data-krak-action` is tracked — no JavaScript required:
 
 ```html
 <button
-  data-krak-event="cta_click"
+  data-krak-action="cc"
   data-krak-data-plan="pro"
   data-krak-data-price="29"
   data-krak-immediate
@@ -138,22 +137,38 @@ With `autoCapture` enabled (default), any click on an element carrying
 like one. Sensitive keys (`email`, `phone`, `name`, `address`, `userId`, …)
 are ignored.
 
-## Receiving events
+### Per-page options
 
-Events are POSTed to your `endpoint` as a single JSON batch:
+With `autoPageView` enabled, every route change emits a `pv`. You can
+opt a specific page out via `definePageMeta`:
+
+```vue
+<script setup lang="ts">
+definePageMeta({
+  krakLite: { pageView: false },
+})
+</script>
+```
+
+This only disables the **automatic** `pv` for that route — you can still
+call `useKrakLite().pageView()` manually if needed.
+
+## Receiving actions
+
+Actions are POSTed to your `endpoint` as a single JSON batch:
 
 ```jsonc
 {
   "v": 1,
   "s": "my-app",
-  "ev": [
+  "d": [
     {
-      "e": "page_view",      // event name
+      "a": "pv",      // action name
       "t": 1718136000000,    // timestamp (ms)
       "p": "/pricing",       // path (query string stripped)
       "s": "my-app",         // source
       "sid": "…",            // in-memory anonymous session id
-      "data": { }            // optional payload
+      "meta": { }            // optional payload
     }
   ]
 }
@@ -162,17 +177,13 @@ Events are POSTed to your `endpoint` as a single JSON batch:
 A minimal Nitro handler:
 
 ```ts
-// server/api/analytics/events.post.ts
+// server/api/analytics/actions.post.ts
 export default defineEventHandler(async (event) => {
   const batch = await readBody(event)
   // persist batch.ev …
   return null
 })
 ```
-
-## Roadmap
-
-- Support per-page tracking options via `definePageMeta`, allowing automatic page views to be enabled or disabled on specific routes.
 
 ## Contribution
 
