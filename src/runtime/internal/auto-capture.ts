@@ -2,7 +2,7 @@
  * Declarative click tracking driven by DOM attributes:
  *
  *   <button
- *     data-krak-event="cta_click"     // event name (required)
+ *     data-krak-action="cc"     // event name (required)
  *     data-krak-data-plan="pro"       // -> data: { plan: "pro" }
  *     data-krak-data-price="29"       // -> data: { price: 29 }
  *     data-krak-immediate             // flush right away
@@ -13,8 +13,8 @@
  */
 
 export type KrakLiteCaptureTarget = {
-  eventName: string
-  data?: Record<string, unknown>
+  actionName: string
+  meta?: Record<string, unknown>
   immediate: boolean
 }
 
@@ -46,7 +46,7 @@ const coerce = (raw: string | undefined): unknown => {
 }
 
 /**
- * Walks up from the clicked node to the nearest `[data-krak-event]` ancestor
+ * Walks up from the clicked node to the nearest `[data-krak-action]` ancestor
  * and extracts what to track. Returns null when there is nothing to capture.
  */
 export const resolveCaptureTarget = (
@@ -54,11 +54,11 @@ export const resolveCaptureTarget = (
 ): KrakLiteCaptureTarget | null => {
   if (!(start instanceof Element)) return null
 
-  const el = start.closest<HTMLElement>('[data-krak-event]')
+  const el = start.closest<HTMLElement>('[data-krak-action]')
   if (!el) return null
 
-  const eventName = el.dataset.krakEvent?.trim()
-  if (!eventName) return null
+  const actionName = el.dataset.krakAction?.trim()
+  if (!actionName) return null
 
   const data: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(el.dataset)) {
@@ -82,8 +82,8 @@ export const resolveCaptureTarget = (
   }
 
   return {
-    eventName,
-    data: Object.keys(data).length ? data : undefined,
+    actionName,
+    meta: Object.keys(data).length ? data : undefined,
     immediate: 'krakImmediate' in el.dataset,
   }
 }

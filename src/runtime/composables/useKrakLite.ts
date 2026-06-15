@@ -1,16 +1,17 @@
-import type {
-  KrakLiteEventName, KrakLiteFlushOptions,
-  KrakLiteOptions,
-  KrakLitePayload,
-  KrakLiteQueuedEvent,
-  KrakLiteTrackOptions,
+import {
+  KRAK_LITE_ACTIONS,
+  type KrakLiteActionName, type KrakLiteFlushOptions,
+  type KrakLiteOptions,
+  type KrakLitePayload,
+  type KrakLiteQueuedAction,
+  type KrakLiteTrackOptions,
 } from '../types'
 
 import { useKrakLiteState } from '../internal/state'
 import { createSessionId } from '../internal/session'
 import { isDoNotTrackEnabled } from '../internal/dnt'
-import {sanitizePath} from "../internal/sanitize";
-import {useRoute, useRuntimeConfig} from "nuxt/app";
+import { sanitizePath } from '../internal/sanitize'
+import { useRoute, useRuntimeConfig } from 'nuxt/app'
 
 export const useKrakLite = () => {
   const route = useRoute()
@@ -27,7 +28,7 @@ export const useKrakLite = () => {
 
   const isTrackingAllowed = (): boolean => {
     if (!options.enabled) return false
-    return !(options.respectDoNotTrack && isDoNotTrackEnabled());
+    return !(options.respectDoNotTrack && isDoNotTrackEnabled())
   }
 
   const sessionId = (): string => {
@@ -42,31 +43,31 @@ export const useKrakLite = () => {
   }
 
   const track = (
-    eventName: KrakLiteEventName,
-    data?: Record<string, unknown>,
+    actionName: KrakLiteActionName,
+    meta?: Record<string, unknown>,
     trackOptions: KrakLiteTrackOptions = {},
   ) => {
     if (import.meta.server) return
     if (!isTrackingAllowed()) return
 
-    const event: KrakLiteQueuedEvent = {
-      e: eventName,
+    const action: KrakLiteQueuedAction = {
+      a: actionName,
       t: Date.now(),
       p: sanitizePath(route.fullPath),
       s: options.source,
       sid: sessionId(),
-      data,
+      meta,
     }
 
     state.queue.push({
-      event,
+      action,
       attemptsLeft: (trackOptions.retry ?? options.retry) + 1,
       retryAfter: trackOptions.retryAfter ?? options.retryAfter,
     })
 
     trimQueue()
 
-    log('event queued', event)
+    log('action queued', action)
 
     if (trackOptions.immediate) {
       void flush()
@@ -74,7 +75,7 @@ export const useKrakLite = () => {
   }
 
   const pageView = (data?: Record<string, unknown>) => {
-    track('page_view', {
+    track(KRAK_LITE_ACTIONS.PAGE_VIEW, {
       title: document.title,
       ...data,
     })
@@ -102,15 +103,15 @@ export const useKrakLite = () => {
     const payload: KrakLitePayload = {
       v: 1,
       s: options.source,
-      ev: items.map(item => item.event),
+      d: items.map(item => item.action),
     }
 
     const body = JSON.stringify(payload)
 
     try {
-      const shouldUseBeacon =
-        options.transport === 'beacon'
-        || (options.transport === 'auto' && flushOptions.preferBeacon)
+      const shouldUseBeacon
+        = options.transport === 'beacon'
+          || (options.transport === 'auto' && flushOptions.preferBeacon)
 
       if (shouldUseBeacon && navigator.sendBeacon) {
         const sent = navigator.sendBeacon(
@@ -168,6 +169,6 @@ export const useKrakLite = () => {
   return {
     track,
     flush,
-    pageView
+    pageView,
   }
 }

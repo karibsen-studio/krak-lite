@@ -25,12 +25,14 @@ const testFlush = () => {
 
     <!-- Declarative auto-capture via data-krak-* attributes -->
     <button
-      data-krak-event="cta_click"
+      data-krak-action="cc"
       data-krak-data-plan="pro"
       data-krak-data-price="29"
       data-krak-immediate
     >
       Subscribe (auto-captured)
     </button>
+
+    <NuxtLink to="/hello">hello</NuxtLink>
   </div>
 </template>

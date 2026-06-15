@@ -8,7 +8,7 @@ export default defineNuxtModule<KrakLiteOptions>({
   },
   defaults: {
     enabled: true,
-    endpoint: '/api/analytics/events',
+    endpoint: '/api/analytics/actions',
     source: 'unknown',
     maxQueueSize: 100,
     flushInterval: 30_000,
@@ -18,7 +18,7 @@ export default defineNuxtModule<KrakLiteOptions>({
     respectDoNotTrack: true,
     retry: 3,
     retryAfter: 5_000,
-    transport: 'fetch'
+    transport: 'fetch',
   },
   setup(_options, _nuxt) {
     const resolver = createResolver(import.meta.url)
