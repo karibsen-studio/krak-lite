@@ -96,6 +96,8 @@ export type KrakLiteQueueItem = {
   action: KrakLiteQueuedAction
   attemptsLeft: number
   retryAfter: number
+  /** Send attempts already failed for this item — drives exponential backoff. */
+  attempts: number
 }
 
 export type KrakLitePayload = {
