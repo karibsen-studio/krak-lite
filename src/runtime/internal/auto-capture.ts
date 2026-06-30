@@ -12,6 +12,8 @@
  * like one, otherwise kept as strings.
  */
 
+import { isForbiddenMetaKey } from './sanitize'
+
 export type KrakLiteCaptureTarget = {
   actionName: string
   meta?: Record<string, unknown>
@@ -19,20 +21,6 @@ export type KrakLiteCaptureTarget = {
 }
 
 const DATA_PREFIX = 'krakData'
-
-const FORBIDDEN_DATA_KEYS = new Set<string>([
-  'email',
-  'phone',
-  'tel',
-  'name',
-  'firstName',
-  'lastName',
-  'address',
-  'ip',
-  'userId',
-  'customerId',
-  'reservationId',
-])
 
 const decapitalize = (value: string): string =>
   value ? value.charAt(0).toLowerCase() + value.slice(1) : value
@@ -74,7 +62,7 @@ export const resolveCaptureTarget = (
 
     const dataKey = decapitalize(key.slice(DATA_PREFIX.length))
 
-    if (FORBIDDEN_DATA_KEYS.has(dataKey)) {
+    if (isForbiddenMetaKey(dataKey)) {
       continue
     }
 
