@@ -1,6 +1,6 @@
 {
   "name": "@karibsen/krak-lite-nuxt",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Lightweight privacy-first analytics module for Nuxt",
   "repository": "karibsen-studio/krak-lite",
   "license": "MIT",
