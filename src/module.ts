@@ -32,3 +32,20 @@ export default defineNuxtModule<KrakLiteOptions>({
     addPlugin(resolver.resolve('./runtime/plugins/krak-lite.client'))
   },
 })
+
+export { KRAK_LITE_ACTIONS } from './runtime/types'
+
+export type {
+  KrakLiteActionName,
+  KrakLiteBaseAction,
+  KrakLiteCustomActionName,
+  KrakLiteFlushOptions,
+  KrakLiteMetaFor,
+  KrakLiteOptions,
+  KrakLitePageMeta,
+  KrakLitePayload,
+  KrakLiteQueueItem,
+  KrakLiteQueuedAction,
+  KrakLiteTrackOptions,
+  KrakLiteTransport,
+} from './runtime/types'

@@ -1,6 +1,7 @@
 import {
   KRAK_LITE_ACTIONS,
   type KrakLiteActionName, type KrakLiteFlushOptions,
+  type KrakLiteMetaFor,
   type KrakLiteOptions,
   type KrakLitePayload,
   type KrakLiteQueuedAction,
@@ -42,9 +43,9 @@ export const useKrakLite = () => {
     }
   }
 
-  const track = (
-    actionName: KrakLiteActionName,
-    meta?: Record<string, unknown>,
+  const track = <A extends KrakLiteActionName>(
+    actionName: A,
+    meta?: KrakLiteMetaFor<A>,
     trackOptions: KrakLiteTrackOptions = {},
   ) => {
     if (import.meta.server) return
@@ -56,7 +57,7 @@ export const useKrakLite = () => {
       p: sanitizePath(route.fullPath),
       s: options.source,
       sid: sessionId(),
-      meta,
+      meta: meta as Record<string, unknown> | undefined,
     }
 
     state.queue.push({

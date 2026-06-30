@@ -12,7 +12,43 @@ export const KRAK_LITE_ACTIONS = {
 export type KrakLiteBaseAction
   = typeof KRAK_LITE_ACTIONS[keyof typeof KRAK_LITE_ACTIONS]
 
-export type KrakLiteActionName = KrakLiteBaseAction | (string & {})
+/**
+ * Augmentable registry of custom analytics events.
+ *
+ * Declared globally so consumers can extend it from anywhere to get autocomplete
+ * on `track()` for their own event names - and an optional typed `meta` payload
+ * per event. A global interface is used (rather than a module-scoped one) because
+ * `KrakLiteActionName` is computed here from `keyof KrakLiteEventRegistry`;
+ * augmenting the re-exported alias on the package entry would not merge into it.
+ *
+ * @example
+ * declare global {
+ *   interface KrakLiteEventRegistry {
+ *     purchase: { amount: number, currency: string }
+ *     newsletter_signup: { plan: string }
+ *   }
+ * }
+ * export {}
+ */
+declare global {
+  // Intentionally empty: this is the seam consumers augment with their events.
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface KrakLiteEventRegistry {}
+}
+
+/** Custom event names declared by consumers through {@link KrakLiteEventRegistry}. */
+export type KrakLiteCustomActionName = keyof KrakLiteEventRegistry & string
+
+export type KrakLiteActionName
+  = | KrakLiteBaseAction
+    | KrakLiteCustomActionName
+    | (string & {})
+
+/** Resolves the `meta` payload type for a given action name, when registered. */
+export type KrakLiteMetaFor<A extends KrakLiteActionName>
+  = A extends keyof KrakLiteEventRegistry
+    ? KrakLiteEventRegistry[A]
+    : Record<string, unknown>
 
 export type KrakLiteFlushOptions = {
   preferBeacon?: boolean

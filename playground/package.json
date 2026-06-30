@@ -8,7 +8,9 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "krak-lite": "latest",
-    "nuxt": "^4.4.8"
+    "@karibsen/krak-lite-nuxt": "link:..",
+    "@tailwindcss/vite": "^4.3.2",
+    "nuxt": "^4.4.8",
+    "tailwindcss": "^4.3.2"
   }
 }
