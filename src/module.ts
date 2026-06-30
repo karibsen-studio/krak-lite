@@ -16,6 +16,7 @@ export default defineNuxtModule<KrakLiteOptions>({
     autoPageView: false,
     autoCapture: true,
     respectDoNotTrack: true,
+    referrer: false,
     retry: 3,
     retryAfter: 5_000,
     transport: 'fetch',
