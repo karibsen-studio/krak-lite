@@ -9,6 +9,10 @@
 
 Lightweight, privacy-first analytics module for Nuxt.
 
+## Why krak-lite?
+
+Most analytics tools drop cookies, fingerprint visitors, and ship their data to a third party - which means consent banners, GDPR paperwork, and giving away your traffic. krak-lite flips that: it stores nothing on the device, keeps no persistent identifier, and sends batched events to **your own** endpoint. You get the product insights without the privacy baggage.
+
 krak-lite batches actions client-side and ships them to **your own** endpoint - no third-party servers, no cookies, no persistent identifiers. The session id lives in memory only and is gone on reload, so a visitor can never be tied back across page lifetimes.
 
 ## Features
@@ -250,6 +254,15 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
+## Roadmap
+
+- 🛠 &nbsp;**Nuxt DevTools tab** - inspect the live action queue, recent flushes and dropped batches without leaving the browser.
+- 🔗 &nbsp;Automatic outbound-link tracking (`oc` action) via a `data-krak-*`-free opt-in.
+- 🚚 &nbsp;Pluggable `transport` (custom sender function) for non-HTTP sinks.
+- 🧰 &nbsp;Server-side `defineKrakLiteHandler` helper to validate incoming batches.
+
+Ideas and PRs welcome.
+
 ## Contribution
 
 <details>
@@ -285,7 +298,6 @@ export default defineEventHandler(async (event) => {
 
 [MIT](https://opensource.org/licenses/MIT) © D3ller
 
-<!-- Badges -->
 [npm-version-src]: https://img.shields.io/npm/v/@karibsen/krak-lite-nuxt/latest.svg?style=flat&colorA=020420&colorB=00DC82
 [npm-version-href]: https://npmjs.com/package/@karibsen/krak-lite-nuxt
 
