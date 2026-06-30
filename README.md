@@ -19,7 +19,7 @@ krak-lite batches actions client-side and ships them to **your own** endpoint - 
 - 🧹 &nbsp;Strips query strings from tracked paths automatically
 - 🖱 &nbsp;Declarative click tracking via `data-krak-*` attributes
 - 📄 &nbsp;Optional automatic `page_view` tracking
-- 🔁 &nbsp;Built-in retry with backoff and a capped queue
+- 🔁 &nbsp;Built-in retry with **exponential backoff** and a capped queue
 - 📡 &nbsp;Reliable last-batch delivery via `navigator.sendBeacon` on page hide
 
 ## Quick Setup
