@@ -69,6 +69,11 @@ export type KrakLiteOptions = {
   autoCapture: boolean
   /** Skip all tracking when the browser signals Do Not Track. */
   respectDoNotTrack: boolean
+  /**
+   * Attach the (query-stripped) referrer origin + path to `page_view` actions
+   * as `meta.ref`. Off by default to keep the default payload identifier-free.
+   */
+  referrer: boolean
   /** Number of extra send attempts after the first failure. */
   retry: number
   /** Delay (ms) before retrying a failed batch. */
