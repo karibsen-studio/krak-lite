@@ -11,7 +11,7 @@ import {
 import { useKrakLiteState } from '../internal/state'
 import { createSessionId } from '../internal/session'
 import { isDoNotTrackEnabled } from '../internal/dnt'
-import { sanitizePath, sanitizeReferrer } from '../internal/sanitize'
+import { sanitizeMeta, sanitizePath, sanitizeReferrer } from '../internal/sanitize'
 import { useRoute, useRuntimeConfig } from 'nuxt/app'
 
 export const useKrakLite = () => {
@@ -57,7 +57,7 @@ export const useKrakLite = () => {
       p: sanitizePath(route.fullPath),
       s: options.source,
       sid: sessionId(),
-      meta: meta as Record<string, unknown> | undefined,
+      meta: sanitizeMeta(meta as Record<string, unknown> | undefined),
     }
 
     state.queue.push({
