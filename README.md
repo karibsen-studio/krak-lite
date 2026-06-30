@@ -169,8 +169,23 @@ With `autoCapture` enabled (default), any click on an element carrying
 ```
 
 `data-krak-data-*` values are coerced to `boolean` / `number` when they look
-like one. Sensitive keys (`email`, `phone`, `name`, `address`, `userId`, …)
-are ignored.
+like one.
+
+### Sensitive data is stripped
+
+Sensitive keys (`email`, `phone`, `name`, `address`, `userId`, `password`,
+`token`, `cardNumber`, …) are **removed from every `meta` payload** before it is
+queued - whether the action was tracked programmatically via `track()` or
+declaratively via `data-krak-*`. Matching is case-insensitive and applies at any
+nesting depth:
+
+```ts
+track('cc', { plan: 'pro', email: 'a@b.com', user: { id: 1, name: 'Ada' } })
+// queued meta -> { plan: 'pro', user: { id: 1 } }
+```
+
+This is a safety net, not a license to send PII - krak-lite is designed to be
+fed non-personal data in the first place.
 
 ### Per-page options
 
