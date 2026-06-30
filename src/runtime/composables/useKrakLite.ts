@@ -12,6 +12,7 @@ import { useKrakLiteState } from '../internal/state'
 import { createSessionId } from '../internal/session'
 import { isDoNotTrackEnabled } from '../internal/dnt'
 import { sanitizeMeta, sanitizePath, sanitizeReferrer } from '../internal/sanitize'
+import { backoffDelay } from '../internal/backoff'
 import { useRoute, useRuntimeConfig } from 'nuxt/app'
 
 export const useKrakLite = () => {
@@ -64,6 +65,7 @@ export const useKrakLite = () => {
       action,
       attemptsLeft: (trackOptions.retry ?? options.retry) + 1,
       retryAfter: trackOptions.retryAfter ?? options.retryAfter,
+      attempts: 0,
     })
 
     trimQueue()
@@ -158,6 +160,7 @@ export const useKrakLite = () => {
         .map(item => ({
           ...item,
           attemptsLeft: item.attemptsLeft - 1,
+          attempts: item.attempts + 1,
         }))
         .filter(item => item.attemptsLeft > 0)
 
@@ -166,7 +169,9 @@ export const useKrakLite = () => {
       if (survivors.length) {
         state.queue.unshift(...survivors)
         trimQueue()
-        scheduleRetry(Math.max(...survivors.map(item => item.retryAfter)))
+        scheduleRetry(
+          Math.max(...survivors.map(item => backoffDelay(item.retryAfter, item.attempts))),
+        )
       }
 
       log('flush failed', { error, requeued: survivors.length, dropped })
