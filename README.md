@@ -4,12 +4,12 @@
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![License][license-src]][license-href]
+[![Bundle size](https://img.shields.io/bundlephobia/minzip/@karibsen/krak-lite-nuxt.svg?style=flat&colorA=020420&colorB=00DC82&label=size)](https://bundlephobia.com/package/@karibsen/krak-lite-nuxt)
 [![Nuxt][nuxt-src]][nuxt-href]
 
 Lightweight, privacy-first analytics module for Nuxt.
 
-krak-lite batches actions client-side and ships them to **your own** endpoint — no third-party servers, no cookies, no persistent identifiers. The session id lives in memory only and is gone on reload, so a visitor can never be tied back across page lifetimes.
+krak-lite batches actions client-side and ships them to **your own** endpoint - no third-party servers, no cookies, no persistent identifiers. The session id lives in memory only and is gone on reload, so a visitor can never be tied back across page lifetimes.
 
 ## Features
 
@@ -112,10 +112,44 @@ import { KRAK_LITE_ACTIONS } from '@karibsen/krak-lite-nuxt'
 // pv, cc
 ```
 
+### Typed custom events
+
+`track()` accepts any string, but you can register your own event names to get
+**autocomplete** on the action name and a **typed `meta` payload**. krak-lite
+exposes a global `KrakLiteEventRegistry` interface - augment it from any `.d.ts`
+in your project (e.g. `types/krak-lite.d.ts`):
+
+```ts
+// types/krak-lite.d.ts
+export {}
+
+declare global {
+  interface KrakLiteEventRegistry {
+    purchase: { amount: number, currency: string }
+    newsletter_signup: { plan: string }
+  }
+}
+```
+
+Each key becomes a suggested action name, and its value types the `meta` argument:
+
+```ts
+const { track } = useKrakLite()
+
+track('purchase', { amount: 29, currency: 'EUR' }) // autocompleted + checked
+track('purchase', { amount: 29 })                  // `currency` is missing
+track('anything-else', { foo: 1 })                 // unregistered names still allowed
+```
+
+> The registry is **global** on purpose: `track`'s action-name type is computed
+> from it internally, and a global interface merges reliably regardless of how
+> the package is imported. Augmenting `declare module '@karibsen/krak-lite-nuxt'`
+> instead would **not** work, because the package only re-exports the interface.
+
 ### Declarative click tracking
 
 With `autoCapture` enabled (default), any click on an element carrying
-`data-krak-action` is tracked — no JavaScript required:
+`data-krak-action` is tracked - no JavaScript required:
 
 ```html
 <button
@@ -150,7 +184,7 @@ definePageMeta({
 </script>
 ```
 
-This only disables the **automatic** `pv` for that route — you can still
+This only disables the **automatic** `pv` for that route - you can still
 call `useKrakLite().pageView()` manually if needed.
 
 ## Receiving actions
