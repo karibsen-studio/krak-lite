@@ -11,7 +11,7 @@ import {
 import { useKrakLiteState } from '../internal/state'
 import { createSessionId } from '../internal/session'
 import { isDoNotTrackEnabled } from '../internal/dnt'
-import { sanitizePath } from '../internal/sanitize'
+import { sanitizePath, sanitizeReferrer } from '../internal/sanitize'
 import { useRoute, useRuntimeConfig } from 'nuxt/app'
 
 export const useKrakLite = () => {
@@ -76,8 +76,17 @@ export const useKrakLite = () => {
   }
 
   const pageView = (data?: Record<string, unknown>) => {
-    track(KRAK_LITE_ACTIONS.PAGE_VIEW, {
+    const meta: Record<string, unknown> = {
       title: document.title,
+    }
+
+    if (options.referrer) {
+      const ref = sanitizeReferrer(document.referrer)
+      if (ref) meta.ref = ref
+    }
+
+    track(KRAK_LITE_ACTIONS.PAGE_VIEW, {
+      ...meta,
       ...data,
     })
   }

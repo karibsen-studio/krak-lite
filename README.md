@@ -69,6 +69,7 @@ krakLite: {
   autoPageView: false,                  // track `page_view` on route change
   autoCapture: true,                    // honor data-krak-* click attributes
   respectDoNotTrack: true,              // skip tracking when DNT is on
+  referrer: false,                      // add query-stripped referrer to page_view
   retry: 3,                             // extra send attempts after a failure
   retryAfter: 5_000,                    // ms before retrying a failed batch
 }
@@ -186,6 +187,21 @@ definePageMeta({
 
 This only disables the **automatic** `pv` for that route - you can still
 call `useKrakLite().pageView()` manually if needed.
+
+### Referrer
+
+Set `referrer: true` to attach where the visitor came from to each `page_view`,
+under `meta.ref`:
+
+```ts
+krakLite: { autoPageView: true, referrer: true }
+// page_view meta -> { title: "…", ref: "https://google.com/search" }
+```
+
+The referrer is reduced to **origin + path only** - the query string and hash
+are stripped so no sensitive parameters leak. It is **off by default**: it is not
+a user identifier and, since krak-lite keeps no persistent storage, it cannot be
+used to link visits - but it does add to the data you collect, so it stays opt-in.
 
 ## Receiving actions
 
